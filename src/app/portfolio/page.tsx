@@ -2,6 +2,7 @@ import {
   getLatestScoredPeriod,
   getPortfolioBuilderData,
   getMarketAverages,
+  getCompanyScoresByCategory,
 } from "@/lib/queries";
 import { PortfolioBuilder } from "@/components/portfolio-builder";
 import { MANAGEMENT_COMPANIES } from "@/lib/constants/funds";
@@ -22,8 +23,9 @@ export default function PortfolioPage() {
 
   const rawData = getPortfolioBuilderData(latestPeriod);
   const marketAverages = getMarketAverages(latestPeriod);
+  const companyScoresRaw = getCompanyScoresByCategory(latestPeriod);
 
-  // Transform to client-friendly format
+  // Transform funds to client-friendly format
   const funds = rawData.map((row) => ({
     fundId: row.fund.id,
     fundName: row.fund.nameHebrew,
@@ -33,15 +35,15 @@ export default function PortfolioPage() {
     scoringCategory: row.score.scoringCategory,
     overallScore: row.score.overallScore,
     returnScore: row.score.returnScore,
-    feeScore: row.score.feeScore,
-    sizeScore: row.score.sizeScore,
     actuarialScore: row.score.actuarialScore,
+    sizeScore: row.score.sizeScore,
+    serviceScore: row.score.serviceScore,
+    claimsScore: row.score.claimsScore,
     avgAnnualYield5Yrs: row.performance.avgAnnualYield5Yrs,
     avgAnnualYield3Yrs: row.performance.avgAnnualYield3Yrs,
     yearToDateYield: row.performance.yearToDateYield,
-    avgAnnualManagementFee: row.performance.avgAnnualManagementFee,
-    avgDepositFee: row.performance.avgDepositFee,
     totalAssets: row.performance.totalAssets,
+    rank: row.score.rank,
   }));
 
   const companies = MANAGEMENT_COMPANIES
@@ -53,25 +55,36 @@ export default function PortfolioPage() {
     scoringCategory: m.scoringCategory,
     avgScore: m.avgScore,
     avgReturnScore: m.avgReturnScore,
-    avgFeeScore: m.avgFeeScore,
     avgReturn5yr: m.avgReturn5yr,
     avgReturn3yr: m.avgReturn3yr,
-    avgFee: m.avgFee,
     fundCount: m.fundCount,
+  }));
+
+  // Transform company scores by category
+  const companyScoresByCategory = companyScoresRaw.map((row) => ({
+    companyId: row.company.id,
+    companyName: row.company.nameHebrew,
+    scoringCategory: row.score.scoringCategory,
+    overallScore: row.score.overallScore,
+    returnScore: row.score.returnScore,
+    actuarialScore: row.score.actuarialScore,
+    serviceScore: row.score.serviceScore,
+    rank: row.score.rank,
+    fundCount: row.score.fundCount,
   }));
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h2 className="text-3xl font-bold mb-2">בונה תיק פנסיה</h2>
+      <h2 className="text-3xl font-bold mb-2">מצא את קרן הפנסיה המתאימה לך</h2>
       <p className="text-muted-foreground mb-8">
-        בחרו חברת פנסיה, הקצו אחוזים למסלולי ההשקעה השונים וקבלו ציון משוקלל
-        בהשוואה לממוצע השוק.
+        ענו על כמה שאלות פשוטות ונמצא עבורכם את מסלול הפנסיה הטוב ביותר
       </p>
 
       <PortfolioBuilder
         funds={funds}
         marketAverages={averages}
         companies={companies}
+        companyScoresByCategory={companyScoresByCategory}
       />
     </div>
   );

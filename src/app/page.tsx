@@ -55,18 +55,43 @@ export default function Home() {
             לחצו על חברה לפירוט מלא של כל המסלולים.
           </p>
           <div className="flex flex-wrap gap-2 mt-5">
-            <Badge variant="outline" className="bg-white/70 backdrop-blur-sm border-primary/20 text-primary font-medium">
-              📅 נתונים: {periodLabel}
+            <Badge variant="outline" className="bg-background/70 backdrop-blur-sm border-primary/20 text-primary font-medium">
+              נתונים: {periodLabel}
             </Badge>
             {refreshInfo?.completedAt && (
-              <Badge variant="secondary" className="bg-white/70 backdrop-blur-sm">
-                🔄 עדכון אחרון:{" "}
-                {new Date(refreshInfo.completedAt).toLocaleDateString("he-IL")}
+              <Badge variant="secondary" className="bg-background/70 backdrop-blur-sm">
+                עדכון: {new Date(refreshInfo.completedAt).toLocaleDateString("he-IL")}
               </Badge>
             )}
-            <Badge variant="secondary" className="bg-white/70 backdrop-blur-sm">
-              🏢 {overallCompanies.length} חברות
+            <Badge variant="secondary" className="bg-background/70 backdrop-blur-sm">
+              {overallCompanies.length} חברות
             </Badge>
+          </div>
+
+          {/* Winner spotlight + CTA */}
+          <div className="flex flex-wrap items-center gap-4 mt-6">
+            {overallCompanies[0] && (
+              <a
+                href={`/company/${overallCompanies[0].company.id}`}
+                className="inline-flex items-center gap-2 bg-background/80 backdrop-blur-sm border border-primary/20 rounded-lg px-4 py-2 hover:border-primary/40 transition-colors"
+              >
+                <span className="text-lg">🏆</span>
+                <span className="text-sm">
+                  <span className="text-muted-foreground">מובילה: </span>
+                  <span className="font-bold">{overallCompanies[0].company.nameHebrew}</span>
+                  <span className="text-primary font-bold mr-2">
+                    {Math.round(overallCompanies[0].score.overallScore)}
+                  </span>
+                </span>
+              </a>
+            )}
+            <a
+              href="/portfolio"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-lg px-5 py-2 text-sm font-medium hover:bg-primary/90 transition-colors"
+            >
+              מצא את הקרן המתאימה לך
+              <span>←</span>
+            </a>
           </div>
         </div>
       </div>

@@ -219,6 +219,25 @@ export function getMarketAverages(reportPeriod: number) {
 }
 
 /**
+ * Gets company scores grouped by scoring category for portfolio wizard.
+ */
+export function getCompanyScoresByCategory(reportPeriod: number) {
+  return db
+    .select({
+      company: managementCompanies,
+      score: companyScores,
+    })
+    .from(companyScores)
+    .innerJoin(
+      managementCompanies,
+      eq(companyScores.companyId, managementCompanies.id)
+    )
+    .where(eq(companyScores.reportPeriod, reportPeriod))
+    .orderBy(companyScores.rank)
+    .all();
+}
+
+/**
  * Gets the last successful data refresh info.
  */
 export function getLastRefreshInfo() {

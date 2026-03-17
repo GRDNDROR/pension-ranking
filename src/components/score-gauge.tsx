@@ -1,22 +1,15 @@
 import { cn } from "@/lib/utils";
+import {
+  getScoreColor,
+  getScoreBg,
+  getScoreRing,
+  getScoreLabel,
+  getScoreBadgeClasses,
+} from "@/lib/score-display";
 
 interface ScoreGaugeProps {
   score: number;
   size?: "sm" | "md" | "lg";
-}
-
-function getScoreColor(score: number) {
-  if (score >= 80) return { ring: "stroke-emerald-500", text: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200" };
-  if (score >= 65) return { ring: "stroke-amber-500", text: "text-amber-700", bg: "bg-amber-50", border: "border-amber-200" };
-  if (score >= 50) return { ring: "stroke-orange-500", text: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200" };
-  return { ring: "stroke-red-500", text: "text-red-700", bg: "bg-red-50", border: "border-red-200" };
-}
-
-function getScoreLabel(score: number): string {
-  if (score >= 80) return "מצוין";
-  if (score >= 65) return "טוב";
-  if (score >= 50) return "בינוני";
-  return "חלש";
 }
 
 const sizeConfig = {
@@ -27,7 +20,7 @@ const sizeConfig = {
 
 export function ScoreGauge({ score, size = "md" }: ScoreGaugeProps) {
   const config = sizeConfig[size];
-  const colors = getScoreColor(score);
+  const colors = getScoreBadgeClasses(score);
   const radius = (config.outer - config.stroke * 2) / 2;
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 100) * circumference;
@@ -73,15 +66,7 @@ export function ScoreGauge({ score, size = "md" }: ScoreGaugeProps) {
 }
 
 export function ScoreBar({ score, label }: { score: number; label: string }) {
-  const colors = getScoreColor(score);
-  const barColor =
-    score >= 80
-      ? "bg-emerald-500"
-      : score >= 65
-        ? "bg-amber-500"
-        : score >= 50
-          ? "bg-orange-500"
-          : "bg-red-500";
+  const colors = getScoreBadgeClasses(score);
 
   return (
     <div className="flex items-center gap-2 min-w-[140px]">
@@ -90,7 +75,7 @@ export function ScoreBar({ score, label }: { score: number; label: string }) {
       </span>
       <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
         <div
-          className={cn("h-full rounded-full transition-all duration-500", barColor)}
+          className={cn("h-full rounded-full transition-all duration-500", getScoreBg(score))}
           style={{ width: `${Math.max(score, 2)}%` }}
         />
       </div>

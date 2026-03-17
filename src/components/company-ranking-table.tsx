@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { getScoreColor, getScoreBg, getScoreLabel } from "@/lib/score-display";
 import { FUND_LIMITATIONS } from "@/lib/constants/funds";
 
 interface CompanyRankingRow {
@@ -30,32 +31,6 @@ type SortField = "rank" | "score" | "returns" | "actuarial" | "service" | "claim
 
 interface CompanyRankingTableProps {
   rankings: CompanyRankingRow[];
-}
-
-// Score range is 35-95 (rescaled). Thresholds calibrated accordingly.
-function getScoreColor(score: number) {
-  if (score >= 85) return "text-emerald-700";
-  if (score >= 75) return "text-emerald-600";
-  if (score >= 65) return "text-amber-700";
-  if (score >= 55) return "text-orange-600";
-  return "text-red-600";
-}
-
-function getScoreBg(score: number) {
-  if (score >= 85) return "bg-emerald-500";
-  if (score >= 75) return "bg-emerald-400";
-  if (score >= 65) return "bg-amber-500";
-  if (score >= 55) return "bg-orange-500";
-  return "bg-red-500";
-}
-
-function getScoreLabel(score: number): string {
-  if (score >= 90) return "מצוין";
-  if (score >= 80) return "טוב מאוד";
-  if (score >= 70) return "טוב";
-  if (score >= 60) return "סביר";
-  if (score >= 50) return "בינוני";
-  return "חלש";
 }
 
 function getRankBadge(rank: number | null) {
@@ -165,7 +140,12 @@ export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
             <a
               key={row.company.id}
               href={`/company/${row.company.id}`}
-              className="block rounded-xl border border-border/60 bg-card hover:border-primary/30 hover:shadow-md transition-all p-4 sm:p-5"
+              className={cn(
+                "block rounded-xl border bg-card hover:shadow-lg transition-all p-4 sm:p-5 group",
+                row.score.rank && row.score.rank <= 3
+                  ? "border-primary/30 hover:border-primary/50"
+                  : "border-border/60 hover:border-primary/30"
+              )}
             >
               <div className="flex items-start gap-4">
                 {/* Rank */}
@@ -174,7 +154,7 @@ export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
                     "inline-flex items-center justify-center w-9 h-9 rounded-full text-sm font-bold border",
                     getRankBadge(row.score.rank)
                   )}>
-                    {row.score.rank}
+                    {row.score.rank === 1 ? "🥇" : row.score.rank === 2 ? "🥈" : row.score.rank === 3 ? "🥉" : row.score.rank}
                   </span>
                 </div>
 
@@ -230,6 +210,16 @@ export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
                       label="תביעות"
                       weight="10%"
                     />
+                  </div>
+
+                  {/* Percentile + chevron */}
+                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/30">
+                    <span className="text-[11px] text-muted-foreground">
+                      גבוה מ-{Math.round(((sortedRankings.length - (sortedRankings.findIndex(r => r.company.id === row.company.id) + 1)) / sortedRankings.length) * 100)}% מהחברות
+                    </span>
+                    <span className="text-muted-foreground/40 group-hover:text-primary transition-colors">
+                      ←
+                    </span>
                   </div>
                 </div>
               </div>

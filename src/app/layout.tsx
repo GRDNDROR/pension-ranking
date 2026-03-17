@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Heebo } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { MobileNav } from "@/components/mobile-nav";
 import "./globals.css";
 
 const heebo = Heebo({
@@ -15,6 +16,13 @@ export const metadata: Metadata = {
     "מדד איכותי לדירוג קרנות פנסיה בישראל - תשואות, איזון אקטוארי, שירות, אישור תביעות ועוד",
 };
 
+const NAV_LINKS = [
+  { href: "/", label: "דירוג" },
+  { href: "/portfolio", label: "מצא קרן" },
+  { href: "/methodology", label: "מתודולוגיה" },
+  { href: "/about", label: "אודות" },
+];
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -25,7 +33,7 @@ export default function RootLayout({
       <body className={`${heebo.variable} font-sans antialiased`}>
         <TooltipProvider>
           <div className="min-h-screen bg-background text-foreground">
-            <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-border/50 shadow-sm">
+            <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50 shadow-sm">
               <div className="container mx-auto px-4 py-3">
                 <div className="flex items-center justify-between">
                   <a href="/" className="flex items-center gap-2 group">
@@ -36,20 +44,20 @@ export default function RootLayout({
                       מדד איכות פנסיה
                     </h1>
                   </a>
-                  <nav className="flex gap-1 text-sm">
-                    <a href="/" className="px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-all font-medium">
-                      דירוג
-                    </a>
-                    <a href="/portfolio" className="px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-all font-medium">
-                      בונה תיק
-                    </a>
-                    <a href="/methodology" className="px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-all font-medium">
-                      מתודולוגיה
-                    </a>
-                    <a href="/about" className="px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-all font-medium">
-                      אודות
-                    </a>
+                  {/* Desktop nav */}
+                  <nav className="hidden md:flex gap-1 text-sm">
+                    {NAV_LINKS.map((link) => (
+                      <a
+                        key={link.href}
+                        href={link.href}
+                        className="px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-all font-medium"
+                      >
+                        {link.label}
+                      </a>
+                    ))}
                   </nav>
+                  {/* Mobile nav */}
+                  <MobileNav links={NAV_LINKS} />
                 </div>
               </div>
             </header>
