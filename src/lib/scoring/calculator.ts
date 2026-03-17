@@ -394,5 +394,14 @@ function calculatePenalties(
     total += PENALTIES.actuarialDeficit.maxDeduction * severity;
   }
 
+  // Penalty: negative net flow (more leaving than joining)
+  const netFlow = fund.performance.netMonthlyDeposits;
+  if (netFlow !== null && netFlow < 0 && fund.performance.totalAssets) {
+    const flowRatio = Math.abs(netFlow) / fund.performance.totalAssets;
+    // Severity scales with how negative the ratio is (capped at 1.0)
+    const severity = Math.min(flowRatio * 100, 1.0);
+    total += PENALTIES.negativeNetFlow.maxDeduction * severity;
+  }
+
   return total;
 }

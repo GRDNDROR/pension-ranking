@@ -209,17 +209,17 @@ export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
                     <ScoreBar
                       score={row.score.returnScore ?? 50}
                       label="תשואות"
-                      weight="40%"
+                      weight="35%"
                     />
                     <ScoreBar
                       score={row.score.actuarialScore ?? 50}
                       label="אקטוארי"
-                      weight="20%"
+                      weight="25%"
                     />
                     <ScoreBar
                       score={row.score.serviceScore ?? 50}
                       label="שירות"
-                      weight="20%"
+                      weight="15%"
                     />
                     <ScoreBar
                       score={row.score.claimsScore ?? 50}

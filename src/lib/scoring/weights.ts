@@ -1,6 +1,6 @@
 export const SCORING_WEIGHTS = {
   returns: {
-    weight: 0.40, // primary factor - long-term returns are what matters most
+    weight: 0.35, // primary factor - long-term returns
     subWeights: {
       trailing5Yr: 0.30, // strongest signal for long-term performance
       trailing3Yr: 0.20,
@@ -11,10 +11,10 @@ export const SCORING_WEIGHTS = {
     },
   },
   actuarialBalance: {
-    weight: 0.20, // key indicator of fund health & solvency
+    weight: 0.25, // crucial indicator of fund health & solvency
   },
   serviceQuality: {
-    weight: 0.20, // CMA service index + availability + responsiveness
+    weight: 0.15, // CMA service index + availability + responsiveness
   },
   claimsApproval: {
     weight: 0.10, // claims approval rates - critical for retirees
@@ -30,7 +30,7 @@ export const SCORING_WEIGHTS = {
     weight: 0.05, // stability indicator
   },
   netFlow: {
-    weight: 0.05, // signal of fund attractiveness
+    weight: 0.10, // fund attractiveness - joining vs leaving balance
   },
   trackFlexibility: {
     weight: 0.0, // merged into serviceQuality
@@ -57,5 +57,9 @@ export const PENALTIES = {
   actuarialDeficit: {
     maxDeduction: 10,
     description: "גירעון אקטוארי - עלול להוביל להפחתת תשואות",
+  },
+  negativeNetFlow: {
+    maxDeduction: 8,
+    description: "זרימת כספים שלילית - יותר עוזבים ממצטרפים",
   },
 } as const;
