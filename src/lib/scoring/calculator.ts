@@ -1,5 +1,5 @@
 import type { MonthlyPerformance, FundCharacteristics, ScoringCategory } from "@/types/fund";
-import { SCORING_WEIGHTS, PENALTIES, FINAL_SCORE_RANGE } from "./weights";
+import { SCORING_WEIGHTS, PENALTIES, FINAL_SCORE_RANGE, SMALL_FUND_DISCOUNT } from "./weights";
 import {
   normalizePercentile,
   normalizePercentileInverse,
@@ -220,14 +220,21 @@ export function calculateAllScores(funds: FundData[]): CalculatedScore[] {
   // Check if this is a retiree category (net flow gets neutral score)
   const isRetireeCategory = funds.length > 0 && isRetireeFund(funds[0].fundName);
 
+  // Pre-compute total company assets for reliability discount
+  const companyAssets = new Map<string, number>();
+  for (const fund of funds) {
+    const current = companyAssets.get(fund.companyId) ?? 0;
+    companyAssets.set(fund.companyId, current + (fund.performance.totalAssets ?? 0));
+  }
+
   // Calculate raw scores for each fund
   const scores = funds.map((fund) => {
     const returnScore = calculateReturnScore(fund.performance, ranges);
     const feeScore = calculateFeeScore(fund.performance, ranges);
     const sizeScore = calculateSizeScore(fund.performance, ranges);
-    const actuarialScore = calculateActuarialScore(fund.performance, ranges);
+    let actuarialScore = calculateActuarialScore(fund.performance, ranges);
     const serviceScore = fund.characteristics?.serviceQualityScore ?? NEUTRAL_SCORE;
-    const claimsScore =
+    let claimsScore =
       fund.characteristics?.claimsApprovalRate != null
         ? normalizePercentile(fund.characteristics.claimsApprovalRate, ranges.claimsApproval) ?? NEUTRAL_SCORE
         : NEUTRAL_SCORE;
@@ -235,6 +242,20 @@ export function calculateAllScores(funds: FundData[]): CalculatedScore[] {
     const netFlowScore = isRetireeCategory
       ? NEUTRAL_SCORE
       : calculateNetFlowScore(fund.performance, ranges);
+
+    // Small fund reliability discount: actuarial and claims scores for small
+    // funds are unreliable (one disability claim skews everything).
+    // Pull those scores toward neutral based on company size.
+    const totalCompanyAssets = companyAssets.get(fund.companyId) ?? 0;
+    if (totalCompanyAssets < SMALL_FUND_DISCOUNT.assetThresholdMillions) {
+      const ratio = totalCompanyAssets / SMALL_FUND_DISCOUNT.assetThresholdMillions;
+      // reliability goes from minReliabilityFactor (tiny) to 1.0 (at threshold)
+      const reliability = SMALL_FUND_DISCOUNT.minReliabilityFactor +
+        ratio * (1 - SMALL_FUND_DISCOUNT.minReliabilityFactor);
+      // Blend score toward neutral: score = neutral + (score - neutral) * reliability
+      actuarialScore = NEUTRAL_SCORE + (actuarialScore - NEUTRAL_SCORE) * reliability;
+      claimsScore = NEUTRAL_SCORE + (claimsScore - NEUTRAL_SCORE) * reliability;
+    }
 
     // Weighted base score
     const baseScore =
