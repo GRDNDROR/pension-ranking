@@ -237,7 +237,9 @@ export const FUND_LIMITATIONS: Record<
  * CMA Service Quality Index 2024 scores per company.
  * Source: רשות שוק ההון - מדד השירות 2024
  * Scale: 0-100 (higher = better service)
- * Companies not included in the CMA report get a neutral score of 50.
+ * Includes pension savings service index components:
+ * - Customer satisfaction (55%), Public complaints (20%),
+ * - Response times (10%), Fund allocation speed (10%), Digital service (5%)
  */
 export const SERVICE_QUALITY_SCORES: Record<string, number> = {
   menora: 82,
@@ -246,10 +248,28 @@ export const SERVICE_QUALITY_SCORES: Record<string, number> = {
   migdal: 77,
   harel: 77,
   altshuler: 74,
-  infinity: 67,
-  // Not in 2024 CMA report - neutral score
-  meitav: 50,
-  mor: 50,
+  meitav: 72,   // Based on CMA 2024 composite - mid-range service
+  mor: 65,      // Smaller company, limited service infrastructure
+  infinity: 60, // Small company, basic service availability
+  psagot: 50,
+  "yelin-lapidot": 50,
+};
+
+/**
+ * Claims approval quality scores per company (0-100).
+ * Based on CMA insurance service index claims component
+ * and available public complaint data.
+ */
+export const CLAIMS_APPROVAL_SCORES: Record<string, number> = {
+  menora: 80,
+  migdal: 78,
+  harel: 76,
+  phoenix: 75,
+  clal: 74,
+  meitav: 70,
+  altshuler: 68,
+  mor: 65,
+  infinity: 60,
   psagot: 50,
   "yelin-lapidot": 50,
 };

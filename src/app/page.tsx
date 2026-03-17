@@ -44,15 +44,15 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Hero */}
-      <div className="relative -mx-4 px-4 py-12 mb-8 bg-gradient-to-bl from-primary/5 via-background to-accent/30 rounded-b-3xl">
+      <div className="relative -mx-4 px-4 py-12 mb-8 bg-gradient-to-br from-primary/5 via-background to-accent/30 rounded-b-3xl">
         <div className="max-w-2xl">
-          <h2 className="text-4xl font-extrabold mb-3 bg-gradient-to-l from-primary to-primary/70 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-extrabold mb-3 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
             מדד איכות קרנות פנסיה
           </h2>
           <p className="text-muted-foreground text-base leading-relaxed">
             דירוג איכותי של חברות הפנסיה בישראל המבוסס על מגוון פרמטרים: תשואות
-            ארוכות טווח, דמי ניהול, גודל קרן, איזון אקטוארי, גמישות מסלולי
-            השקעה ועוד. לחצו על חברה לפירוט מלא של כל המסלולים.
+            ארוכות טווח, איזון אקטוארי, איכות שירות וזמינות, אישור תביעות ועוד.
+            לחצו על חברה לפירוט מלא של כל המסלולים.
           </p>
           <div className="flex flex-wrap gap-2 mt-5">
             <Badge variant="outline" className="bg-white/70 backdrop-blur-sm border-primary/20 text-primary font-medium">

@@ -123,4 +123,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* RTL: default table header/cell text alignment to right */
+  th,
+  td {
+    text-align: right;
+  }
 }

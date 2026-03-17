@@ -8,11 +8,11 @@ import {
   companyScores,
   dataRefreshLog,
 } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { fetchPensionNetData, fetchLatestPeriod } from "./fetchers/pension-net";
 import { fetchFullHistoricalData, calculateLongTermReturns } from "./fetchers/historical-returns";
 import { normalizeCKANRecord, createFundSlug } from "./normalizers/fund-mapper";
-import { MANAGEMENT_COMPANIES, FUND_LIMITATIONS, ALL_SCORING_CATEGORIES, REGULAR_CATEGORIES, SERVICE_QUALITY_SCORES } from "@/lib/constants/funds";
+import { MANAGEMENT_COMPANIES, FUND_LIMITATIONS, ALL_SCORING_CATEGORIES, REGULAR_CATEGORIES, SERVICE_QUALITY_SCORES, CLAIMS_APPROVAL_SCORES } from "@/lib/constants/funds";
 import {
   calculateScoresByCategory,
   calculateCompanyScores,
@@ -59,8 +59,9 @@ export function seedFundCharacteristics() {
     const limits = FUND_LIMITATIONS[fund.companyId];
     if (!limits) continue;
 
-    // Use real CMA service quality scores when available
+    // Use real CMA service quality scores and claims data when available
     const serviceScore = SERVICE_QUALITY_SCORES[fund.companyId] ?? null;
+    const claimsScore = CLAIMS_APPROVAL_SCORES[fund.companyId] ?? null;
 
     db.insert(fundCharacteristics)
       .values({
@@ -70,7 +71,7 @@ export function seedFundCharacteristics() {
         numberOfTagmulimTracks: limits.numberOfTagmulimTracks,
         numberOfPitzuyimTracks: limits.numberOfPitzuyimTracks,
         serviceQualityScore: serviceScore,
-        claimsApprovalRate: null,
+        claimsApprovalRate: claimsScore,
         publicComplaintsRate: null,
         updatedAt: now,
       })
@@ -82,6 +83,7 @@ export function seedFundCharacteristics() {
           numberOfTagmulimTracks: limits.numberOfTagmulimTracks,
           numberOfPitzuyimTracks: limits.numberOfPitzuyimTracks,
           serviceQualityScore: serviceScore,
+          claimsApprovalRate: claimsScore,
           updatedAt: now,
         },
       })
@@ -271,6 +273,22 @@ async function calculateAndStoreScores(reportPeriod: number) {
   const allChars = db.select().from(fundCharacteristics).all();
   const charsMap = new Map(allChars.map((c) => [c.fundId, c]));
 
+  // Get latest available actuarial data per fund (may lag behind current period)
+  const actuarialFallback = new Map<string, number>();
+  const actuarialRows = db.all(sql`
+    SELECT fund_id, actuarial_adjustment
+    FROM monthly_performance
+    WHERE actuarial_adjustment IS NOT NULL
+      AND report_period = (
+        SELECT MAX(report_period) FROM monthly_performance mp2
+        WHERE mp2.fund_id = monthly_performance.fund_id
+          AND mp2.actuarial_adjustment IS NOT NULL
+      )
+  `) as Array<{ fund_id: string; actuarial_adjustment: number }>;
+  for (const row of actuarialRows) {
+    actuarialFallback.set(row.fund_id, row.actuarial_adjustment);
+  }
+
   // Build fund data array for scoring
   const fundDataArray: FundData[] = perfData
     .map((perf) => {
@@ -292,6 +310,9 @@ async function calculateAndStoreScores(reportPeriod: number) {
             publicComplaintsRate: chars.publicComplaintsRate,
           }
         : undefined;
+
+      // Use current period actuarial data, or fall back to latest available
+      const actuarialAdj = perf.actuarialAdjustment ?? actuarialFallback.get(perf.fundId) ?? null;
 
       return {
         fundId: fund.id,
@@ -316,7 +337,7 @@ async function calculateAndStoreScores(reportPeriod: number) {
           sharpeRatio: perf.sharpeRatio,
           alpha: perf.alpha,
           standardDeviation: perf.standardDeviation,
-          actuarialAdjustment: perf.actuarialAdjustment,
+          actuarialAdjustment: actuarialAdj,
         } as MonthlyPerformance,
         characteristics: mappedChars,
       };

@@ -45,6 +45,7 @@ export function ReturnsChart({ data }: ReturnsChartProps) {
           interval="preserveStartEnd"
         />
         <YAxis
+          orientation="right"
           tick={{ fontSize: 11 }}
           tickFormatter={(v) => `${v}%`}
           width={50}

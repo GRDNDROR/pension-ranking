@@ -1,17 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { ScoreGauge, ScoreBar } from "@/components/score-gauge";
-import { FUND_LIMITATIONS } from "@/lib/constants/funds";
 import { cn } from "@/lib/utils";
+import { FUND_LIMITATIONS } from "@/lib/constants/funds";
 
 interface CompanyRankingRow {
   company: {
@@ -35,16 +26,57 @@ interface CompanyRankingRow {
   };
 }
 
-type SortField = "rank" | "score" | "returns" | "fees" | "size" | "funds";
+type SortField = "rank" | "score" | "returns" | "actuarial" | "service" | "claims";
 
 interface CompanyRankingTableProps {
   rankings: CompanyRankingRow[];
 }
 
-function formatAssets(millions: number | null): string {
-  if (millions === null || millions === undefined) return "-";
-  if (millions >= 1000) return `${(millions / 1000).toFixed(1)} מיליארד ₪`;
-  return `${Math.round(millions)} מיליון ₪`;
+function getScoreColor(score: number) {
+  if (score >= 80) return "text-emerald-700";
+  if (score >= 65) return "text-amber-700";
+  if (score >= 50) return "text-orange-600";
+  return "text-red-600";
+}
+
+function getScoreBg(score: number) {
+  if (score >= 80) return "bg-emerald-500";
+  if (score >= 65) return "bg-amber-500";
+  if (score >= 50) return "bg-orange-500";
+  return "bg-red-500";
+}
+
+function getScoreLabel(score: number): string {
+  if (score >= 85) return "מצוין";
+  if (score >= 75) return "טוב מאוד";
+  if (score >= 65) return "טוב";
+  if (score >= 50) return "בינוני";
+  return "חלש";
+}
+
+function getRankBadge(rank: number | null) {
+  if (rank === 1) return "bg-amber-100 text-amber-800 border-amber-300";
+  if (rank === 2) return "bg-slate-100 text-slate-700 border-slate-300";
+  if (rank === 3) return "bg-orange-100 text-orange-800 border-orange-300";
+  return "bg-muted text-muted-foreground border-border";
+}
+
+function ScoreBar({ score, label, weight }: { score: number; label: string; weight: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[11px] text-muted-foreground w-14 text-start shrink-0">{label}</span>
+      <div className="flex-1 h-2 bg-muted/80 rounded-full overflow-hidden min-w-[60px]">
+        <div
+          className={cn("h-full rounded-full transition-all", getScoreBg(score))}
+          style={{ width: `${Math.max(score, 3)}%` }}
+        />
+      </div>
+      <span className={cn("text-[11px] font-semibold w-8 text-start tabular-nums", getScoreColor(score))}>
+        {Math.round(score)}
+      </span>
+      <span className="text-[9px] text-muted-foreground/60 w-8">{weight}</span>
+    </div>
+  );
 }
 
 export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
@@ -67,17 +99,17 @@ export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
           aVal = a.score.returnScore ?? -999;
           bVal = b.score.returnScore ?? -999;
           break;
-        case "fees":
-          aVal = a.score.feeScore ?? -999;
-          bVal = b.score.feeScore ?? -999;
+        case "actuarial":
+          aVal = a.score.actuarialScore ?? -999;
+          bVal = b.score.actuarialScore ?? -999;
           break;
-        case "size":
-          aVal = a.score.totalAssets ?? 0;
-          bVal = b.score.totalAssets ?? 0;
+        case "service":
+          aVal = a.score.serviceScore ?? -999;
+          bVal = b.score.serviceScore ?? -999;
           break;
-        case "funds":
-          aVal = a.score.fundCount ?? 0;
-          bVal = b.score.fundCount ?? 0;
+        case "claims":
+          aVal = a.score.claimsScore ?? -999;
+          bVal = b.score.claimsScore ?? -999;
           break;
         default:
           return 0;
@@ -113,111 +145,119 @@ export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
   }
 
   return (
-    <div className="rounded-xl border border-border/60 overflow-hidden shadow-sm bg-card">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted/30 border-b border-border/50">
-            <TableHead className="w-12 text-center">
-              <button onClick={() => handleSort("rank")} className="font-medium">
-                #{getSortIcon("rank")}
-              </button>
-            </TableHead>
-            <TableHead>חברה</TableHead>
-            <TableHead className="text-center">
-              <button onClick={() => handleSort("score")} className="font-medium">
-                ציון{getSortIcon("score")}
-              </button>
-            </TableHead>
-            <TableHead className="hidden md:table-cell">פירוט ציון</TableHead>
-            <TableHead className="text-center hidden sm:table-cell">
-              <button onClick={() => handleSort("returns")} className="font-medium">
-                תשואות{getSortIcon("returns")}
-              </button>
-            </TableHead>
-            <TableHead className="text-center hidden lg:table-cell">
-              <button onClick={() => handleSort("size")} className="font-medium">
-                נכסים{getSortIcon("size")}
-              </button>
-            </TableHead>
-            <TableHead className="text-center hidden lg:table-cell">
-              <button onClick={() => handleSort("funds")} className="font-medium">
-                מסלולים{getSortIcon("funds")}
-              </button>
-            </TableHead>
-            <TableHead className="hidden md:table-cell">הערות</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedRankings.map((row) => {
-            const penalties = getCompanyPenalties(row.company.id);
-            return (
-              <TableRow key={row.company.id} className="hover:bg-primary/[0.02] transition-colors border-b border-border/30 last:border-b-0">
-                <TableCell className="text-center">
+    <div className="space-y-4">
+      {/* Legend */}
+      <div className="flex items-center gap-4 text-[11px] text-muted-foreground px-1 flex-wrap">
+        <span>ציונים מ-0 עד 100. ככל שהציון גבוה יותר, כך איכות הקרן טובה יותר.</span>
+      </div>
+
+      {/* Cards */}
+      <div className="space-y-3">
+        {sortedRankings.map((row) => {
+          const penalties = getCompanyPenalties(row.company.id);
+          const score = row.score.overallScore;
+
+          return (
+            <a
+              key={row.company.id}
+              href={`/company/${row.company.id}`}
+              className="block rounded-xl border border-border/60 bg-card hover:border-primary/30 hover:shadow-md transition-all p-4 sm:p-5"
+            >
+              <div className="flex items-start gap-4">
+                {/* Rank */}
+                <div className="flex flex-col items-center gap-1 shrink-0">
                   <span className={cn(
-                    "inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold",
-                    row.score.rank === 1 ? "bg-amber-100 text-amber-700" :
-                    row.score.rank === 2 ? "bg-slate-100 text-slate-600" :
-                    row.score.rank === 3 ? "bg-orange-100 text-orange-700" :
-                    "text-muted-foreground"
+                    "inline-flex items-center justify-center w-9 h-9 rounded-full text-sm font-bold border",
+                    getRankBadge(row.score.rank)
                   )}>
                     {row.score.rank}
                   </span>
-                </TableCell>
-                <TableCell>
-                  <a
-                    href={`/company/${row.company.id}`}
-                    className="hover:text-primary transition-colors"
-                  >
-                    <div className="font-medium text-base">
-                      {row.company.nameHebrew}
+                </div>
+
+                {/* Main content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="font-bold text-lg">{row.company.nameHebrew}</h3>
+                      {penalties.length > 0 && (
+                        <div className="flex gap-1 mt-1">
+                          {penalties.map((p, i) => (
+                            <span key={i} className="text-[10px] bg-destructive/10 text-destructive px-2 py-0.5 rounded-full">
+                              {p}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </a>
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="flex justify-center">
-                    <ScoreGauge score={row.score.overallScore} size="sm" />
+
+                    {/* Overall score */}
+                    <div className="flex flex-col items-center shrink-0">
+                      <div className={cn(
+                        "text-3xl font-black tabular-nums",
+                        getScoreColor(score)
+                      )}>
+                        {Math.round(score)}
+                      </div>
+                      <span className={cn("text-xs font-medium", getScoreColor(score))}>
+                        {getScoreLabel(score)}
+                      </span>
+                    </div>
                   </div>
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <div className="space-y-1">
+
+                  {/* Score breakdown */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                     <ScoreBar
                       score={row.score.returnScore ?? 50}
-                      label="תשואה"
+                      label="תשואות"
+                      weight="40%"
                     />
                     <ScoreBar
                       score={row.score.actuarialScore ?? 50}
                       label="אקטוארי"
+                      weight="20%"
+                    />
+                    <ScoreBar
+                      score={row.score.serviceScore ?? 50}
+                      label="שירות"
+                      weight="20%"
+                    />
+                    <ScoreBar
+                      score={row.score.claimsScore ?? 50}
+                      label="תביעות"
+                      weight="10%"
                     />
                   </div>
-                </TableCell>
-                <TableCell className="text-center hidden sm:table-cell">
-                  <span className="text-sm font-medium">
-                    {row.score.returnScore?.toFixed(0) ?? "-"}
-                  </span>
-                </TableCell>
-                <TableCell className="text-center hidden lg:table-cell text-xs">
-                  {formatAssets(row.score.totalAssets)}
-                </TableCell>
-                <TableCell className="text-center hidden lg:table-cell text-sm">
-                  {row.score.fundCount ?? "-"}
-                </TableCell>
-                <TableCell className="hidden md:table-cell">
-                  <div className="flex flex-wrap gap-1">
-                    {penalties.map((p, i) => (
-                      <span
-                        key={i}
-                        className="text-xs bg-destructive/10 text-destructive px-2 py-0.5 rounded-full"
-                      >
-                        {p}
-                      </span>
-                    ))}
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+
+      {/* Sort controls */}
+      <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+        <span>מיין לפי:</span>
+        {[
+          { field: "rank" as SortField, label: "דירוג" },
+          { field: "score" as SortField, label: "ציון כולל" },
+          { field: "returns" as SortField, label: "תשואות" },
+          { field: "actuarial" as SortField, label: "אקטוארי" },
+          { field: "service" as SortField, label: "שירות" },
+        ].map(({ field, label }) => (
+          <button
+            key={field}
+            onClick={() => handleSort(field)}
+            className={cn(
+              "px-3 py-1.5 rounded-full border transition-colors",
+              sortField === field
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card border-border hover:border-primary/50"
+            )}
+          >
+            {label}{sortField === field ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

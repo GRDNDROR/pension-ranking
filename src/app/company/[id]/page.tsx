@@ -109,7 +109,7 @@ export default async function CompanyDetailPage({
         href="/"
         className="text-sm text-muted-foreground hover:text-foreground mb-4 inline-block"
       >
-        &larr; חזרה לדירוג
+        &rarr; חזרה לדירוג
       </a>
 
       {/* Header */}

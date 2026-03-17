@@ -12,7 +12,7 @@ const heebo = Heebo({
 export const metadata: Metadata = {
   title: "מדד איכות קרנות פנסיה",
   description:
-    "מדד איכותי לדירוג קרנות פנסיה בישראל - תשואות, דמי ניהול, איזון אקטוארי ועוד",
+    "מדד איכותי לדירוג קרנות פנסיה בישראל - תשואות, איזון אקטוארי, שירות, אישור תביעות ועוד",
 };
 
 export default function RootLayout({

@@ -115,14 +115,14 @@ export default async function FundDetailPage({
           href="/"
           className="text-sm text-muted-foreground hover:text-foreground"
         >
-          &larr; חזרה לדירוג
+          &rarr; חזרה לדירוג
         </a>
         {company && (
           <a
             href={`/company/${company.id}`}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
-            &larr; {company.nameHebrew}
+            &rarr; {company.nameHebrew}
           </a>
         )}
       </div>
