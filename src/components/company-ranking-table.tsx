@@ -134,11 +134,6 @@ export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
                 תשואות{getSortIcon("returns")}
               </button>
             </TableHead>
-            <TableHead className="text-center hidden sm:table-cell">
-              <button onClick={() => handleSort("fees")} className="font-medium">
-                דמי ניהול{getSortIcon("fees")}
-              </button>
-            </TableHead>
             <TableHead className="text-center hidden lg:table-cell">
               <button onClick={() => handleSort("size")} className="font-medium">
                 נכסים{getSortIcon("size")}
@@ -190,10 +185,6 @@ export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
                       label="תשואה"
                     />
                     <ScoreBar
-                      score={row.score.feeScore ?? 50}
-                      label="ד״נ"
-                    />
-                    <ScoreBar
                       score={row.score.actuarialScore ?? 50}
                       label="אקטוארי"
                     />
@@ -202,11 +193,6 @@ export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
                 <TableCell className="text-center hidden sm:table-cell">
                   <span className="text-sm font-medium">
                     {row.score.returnScore?.toFixed(0) ?? "-"}
-                  </span>
-                </TableCell>
-                <TableCell className="text-center hidden sm:table-cell">
-                  <span className="text-sm font-medium">
-                    {row.score.feeScore?.toFixed(0) ?? "-"}
                   </span>
                 </TableCell>
                 <TableCell className="text-center hidden lg:table-cell text-xs">

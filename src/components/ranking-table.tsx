@@ -49,7 +49,6 @@ type SortField =
   | "score"
   | "returns5yr"
   | "returns3yr"
-  | "fees"
   | "size";
 
 interface RankingTableProps {
@@ -120,11 +119,6 @@ export function RankingTable({ rankings }: RankingTableProps) {
           aVal = a.performance.avgAnnualYield3Yrs ?? -999;
           bVal = b.performance.avgAnnualYield3Yrs ?? -999;
           break;
-        case "fees":
-          aVal = a.performance.avgAnnualManagementFee ?? 999;
-          bVal = b.performance.avgAnnualManagementFee ?? 999;
-          // For fees, lower is better so reverse default
-          return sortDir === "asc" ? aVal - bVal : bVal - aVal;
         case "size":
           aVal = a.performance.totalAssets ?? 0;
           bVal = b.performance.totalAssets ?? 0;
@@ -141,7 +135,7 @@ export function RankingTable({ rankings }: RankingTableProps) {
       setSortDir(sortDir === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortDir(field === "rank" || field === "fees" ? "asc" : "desc");
+      setSortDir(field === "rank" ? "asc" : "desc");
     }
   }
 
@@ -256,11 +250,6 @@ export function RankingTable({ rankings }: RankingTableProps) {
                   תשואה 3 שנים{getSortIcon("returns3yr")}
                 </button>
               </TableHead>
-              <TableHead className="text-center">
-                <button onClick={() => handleSort("fees")} className="font-medium">
-                  דמי ניהול{getSortIcon("fees")}
-                </button>
-              </TableHead>
               <TableHead className="text-center hidden lg:table-cell">
                 <button onClick={() => handleSort("size")} className="font-medium">
                   נכסים{getSortIcon("size")}
@@ -301,12 +290,8 @@ export function RankingTable({ rankings }: RankingTableProps) {
                         label="תשואה"
                       />
                       <ScoreBar
-                        score={row.score.feeScore ?? 50}
-                        label="ד״נ"
-                      />
-                      <ScoreBar
-                        score={row.score.sizeScore ?? 50}
-                        label="גודל"
+                        score={row.score.actuarialScore ?? 50}
+                        label="אקטוארי"
                       />
                     </div>
                   </TableCell>
@@ -315,9 +300,6 @@ export function RankingTable({ rankings }: RankingTableProps) {
                   </TableCell>
                   <TableCell className="text-center tabular-nums hidden sm:table-cell">
                     {formatPercent(row.performance.avgAnnualYield3Yrs)}
-                  </TableCell>
-                  <TableCell className="text-center tabular-nums">
-                    {formatPercent(row.performance.avgAnnualManagementFee)}
                   </TableCell>
                   <TableCell className="text-center hidden lg:table-cell text-xs">
                     {formatAssets(row.performance.totalAssets)}

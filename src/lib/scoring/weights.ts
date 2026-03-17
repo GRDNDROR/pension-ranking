@@ -20,17 +20,17 @@ export const SCORING_WEIGHTS = {
     weight: 0.10, // claims approval rates - critical for retirees
   },
   fees: {
-    weight: 0.05, // marginal factor - external management fees per track
+    weight: 0.0, // removed - not meaningful for pension fund quality comparison
     subWeights: {
       managementFee: 0.7,
       depositFee: 0.3,
     },
   },
   fundSize: {
-    weight: 0.03, // minor stability indicator
+    weight: 0.05, // stability indicator
   },
   netFlow: {
-    weight: 0.02, // minor signal of fund attractiveness
+    weight: 0.05, // signal of fund attractiveness
   },
   trackFlexibility: {
     weight: 0.0, // merged into serviceQuality

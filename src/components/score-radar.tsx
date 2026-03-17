@@ -32,13 +32,11 @@ export function ScoreRadar({
 }: ScoreRadarProps) {
   const data = [
     { metric: "תשואות", value: returnScore, fullMark: 100 },
-    { metric: "דמי ניהול", value: feeScore, fullMark: 100 },
-    { metric: "גודל קרן", value: sizeScore, fullMark: 100 },
     { metric: "איזון אקטוארי", value: actuarialScore, fullMark: 100 },
-    { metric: "שירות", value: serviceScore, fullMark: 100 },
+    { metric: "שירות וזמינות", value: serviceScore, fullMark: 100 },
+    { metric: "אישור תביעות", value: claimsScore, fullMark: 100 },
+    { metric: "גודל קרן", value: sizeScore, fullMark: 100 },
     { metric: "זרימת כספים", value: netFlowScore, fullMark: 100 },
-    { metric: "גמישות מסלולים", value: flexibilityScore, fullMark: 100 },
-    { metric: "תביעות", value: claimsScore, fullMark: 100 },
   ];
 
   return (
