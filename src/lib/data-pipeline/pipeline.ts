@@ -273,20 +273,49 @@ async function calculateAndStoreScores(reportPeriod: number) {
   const allChars = db.select().from(fundCharacteristics).all();
   const charsMap = new Map(allChars.map((c) => [c.fundId, c]));
 
-  // Get latest available actuarial data per fund (may lag behind current period)
+  // Calculate composite actuarial score per fund across all available history
+  // Combines: weighted average across time periods + penalty for frequency of negative periods
+  // Recent years = 35%, 3-5yr = 25%, 5-10yr = 20%, 10yr+ = 20%
   const actuarialFallback = new Map<string, number>();
   const actuarialRows = db.all(sql`
-    SELECT fund_id, actuarial_adjustment
+    SELECT fund_id,
+      AVG(CASE WHEN report_period >= ${reportPeriod - 300} THEN actuarial_adjustment END) as avg_3yr,
+      AVG(CASE WHEN report_period >= ${reportPeriod - 500} AND report_period < ${reportPeriod - 300} THEN actuarial_adjustment END) as avg_3to5yr,
+      AVG(CASE WHEN report_period >= ${reportPeriod - 1000} AND report_period < ${reportPeriod - 500} THEN actuarial_adjustment END) as avg_5to10yr,
+      AVG(CASE WHEN report_period < ${reportPeriod - 1000} THEN actuarial_adjustment END) as avg_10yr_plus,
+      AVG(actuarial_adjustment) as avg_all,
+      CAST(SUM(CASE WHEN actuarial_adjustment < 0 THEN 1 ELSE 0 END) AS REAL) / COUNT(*) as pct_negative,
+      MIN(actuarial_adjustment) as worst_ever
     FROM monthly_performance
     WHERE actuarial_adjustment IS NOT NULL
-      AND report_period = (
-        SELECT MAX(report_period) FROM monthly_performance mp2
-        WHERE mp2.fund_id = monthly_performance.fund_id
-          AND mp2.actuarial_adjustment IS NOT NULL
-      )
-  `) as Array<{ fund_id: string; actuarial_adjustment: number }>;
+    GROUP BY fund_id
+  `) as Array<{
+    fund_id: string;
+    avg_3yr: number | null;
+    avg_3to5yr: number | null;
+    avg_5to10yr: number | null;
+    avg_10yr_plus: number | null;
+    avg_all: number;
+    pct_negative: number;
+    worst_ever: number;
+  }>;
   for (const row of actuarialRows) {
-    actuarialFallback.set(row.fund_id, row.actuarial_adjustment);
+    // Weighted average across time periods (long-term track record is crucial)
+    let totalWeight = 0;
+    let weightedSum = 0;
+    if (row.avg_3yr != null) { weightedSum += row.avg_3yr * 0.35; totalWeight += 0.35; }
+    if (row.avg_3to5yr != null) { weightedSum += row.avg_3to5yr * 0.25; totalWeight += 0.25; }
+    if (row.avg_5to10yr != null) { weightedSum += row.avg_5to10yr * 0.20; totalWeight += 0.20; }
+    if (row.avg_10yr_plus != null) { weightedSum += row.avg_10yr_plus * 0.20; totalWeight += 0.20; }
+
+    let avgScore = totalWeight > 0 ? weightedSum / totalWeight : row.avg_all;
+
+    // Penalize funds with high frequency of negative actuarial adjustments
+    // pct_negative of 0.5+ is very concerning (deficit more than half the time)
+    const negativePenalty = row.pct_negative * 0.3; // up to -0.3 penalty
+    avgScore = avgScore - negativePenalty;
+
+    actuarialFallback.set(row.fund_id, avgScore);
   }
 
   // Build fund data array for scoring
