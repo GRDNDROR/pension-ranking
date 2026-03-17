@@ -82,7 +82,7 @@ export function HomepageTabs({
 }: HomepageTabsProps) {
   return (
     <Tabs defaultValue="overall" className="w-full">
-      <TabsList className="mb-6">
+      <TabsList className="mb-6 bg-muted/50 p-1">
         <TabsTrigger value="overall">סקירה כללית</TabsTrigger>
         <TabsTrigger value="comprehensive">מקיפה</TabsTrigger>
         <TabsTrigger value="non_comprehensive">כללית/משלימה</TabsTrigger>

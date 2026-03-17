@@ -44,24 +44,30 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Hero */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-2">מדד איכות קרנות פנסיה</h2>
-        <p className="text-muted-foreground max-w-2xl">
-          דירוג איכותי של חברות הפנסיה בישראל המבוסס על מגוון פרמטרים: תשואות
-          ארוכות טווח, דמי ניהול, גודל קרן, איזון אקטוארי, גמישות מסלולי
-          השקעה ועוד. לחצו על חברה לפירוט מלא של כל המסלולים.
-        </p>
-        <div className="flex gap-3 mt-4">
-          <Badge variant="outline">נתונים: {periodLabel}</Badge>
-          {refreshInfo?.completedAt && (
-            <Badge variant="secondary">
-              עדכון אחרון:{" "}
-              {new Date(refreshInfo.completedAt).toLocaleDateString("he-IL")}
+      <div className="relative -mx-4 px-4 py-12 mb-8 bg-gradient-to-bl from-primary/5 via-background to-accent/30 rounded-b-3xl">
+        <div className="max-w-2xl">
+          <h2 className="text-4xl font-extrabold mb-3 bg-gradient-to-l from-primary to-primary/70 bg-clip-text text-transparent">
+            מדד איכות קרנות פנסיה
+          </h2>
+          <p className="text-muted-foreground text-base leading-relaxed">
+            דירוג איכותי של חברות הפנסיה בישראל המבוסס על מגוון פרמטרים: תשואות
+            ארוכות טווח, דמי ניהול, גודל קרן, איזון אקטוארי, גמישות מסלולי
+            השקעה ועוד. לחצו על חברה לפירוט מלא של כל המסלולים.
+          </p>
+          <div className="flex flex-wrap gap-2 mt-5">
+            <Badge variant="outline" className="bg-white/70 backdrop-blur-sm border-primary/20 text-primary font-medium">
+              📅 נתונים: {periodLabel}
             </Badge>
-          )}
-          <Badge variant="secondary">
-            {overallCompanies.length} חברות
-          </Badge>
+            {refreshInfo?.completedAt && (
+              <Badge variant="secondary" className="bg-white/70 backdrop-blur-sm">
+                🔄 עדכון אחרון:{" "}
+                {new Date(refreshInfo.completedAt).toLocaleDateString("he-IL")}
+              </Badge>
+            )}
+            <Badge variant="secondary" className="bg-white/70 backdrop-blur-sm">
+              🏢 {overallCompanies.length} חברות
+            </Badge>
+          </div>
         </div>
       </div>
 

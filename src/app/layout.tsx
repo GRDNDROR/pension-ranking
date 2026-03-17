@@ -25,23 +25,28 @@ export default function RootLayout({
       <body className={`${heebo.variable} font-sans antialiased`}>
         <TooltipProvider>
           <div className="min-h-screen bg-background text-foreground">
-            <header className="border-b border-border">
-              <div className="container mx-auto px-4 py-4">
+            <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-border/50 shadow-sm">
+              <div className="container mx-auto px-4 py-3">
                 <div className="flex items-center justify-between">
-                  <h1 className="text-xl font-bold">
-                    <a href="/">מדד איכות קרנות פנסיה</a>
-                  </h1>
-                  <nav className="flex gap-6 text-sm text-muted-foreground">
-                    <a href="/" className="hover:text-foreground transition-colors">
+                  <a href="/" className="flex items-center gap-2 group">
+                    <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
+                      פ
+                    </div>
+                    <h1 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                      מדד איכות פנסיה
+                    </h1>
+                  </a>
+                  <nav className="flex gap-1 text-sm">
+                    <a href="/" className="px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-all font-medium">
                       דירוג
                     </a>
-                    <a href="/portfolio" className="hover:text-foreground transition-colors">
+                    <a href="/portfolio" className="px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-all font-medium">
                       בונה תיק
                     </a>
-                    <a href="/methodology" className="hover:text-foreground transition-colors">
+                    <a href="/methodology" className="px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-all font-medium">
                       מתודולוגיה
                     </a>
-                    <a href="/about" className="hover:text-foreground transition-colors">
+                    <a href="/about" className="px-3 py-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-all font-medium">
                       אודות
                     </a>
                   </nav>
@@ -49,12 +54,18 @@ export default function RootLayout({
               </div>
             </header>
             <main>{children}</main>
-            <footer className="border-t border-border mt-16">
-              <div className="container mx-auto px-4 py-6 text-sm text-muted-foreground">
-                <p>
-                  המידע באתר זה הינו אינפורמטיבי בלבד ואינו מהווה ייעוץ פנסיוני
-                  או המלצה. מקור הנתונים: data.gov.il, פנסיה נט.
-                </p>
+            <footer className="border-t border-border/50 mt-16 bg-muted/30">
+              <div className="container mx-auto px-4 py-8 text-sm text-muted-foreground">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <p className="max-w-xl">
+                    המידע באתר זה הינו אינפורמטיבי בלבד ואינו מהווה ייעוץ פנסיוני
+                    או המלצה. מקור הנתונים: data.gov.il, פנסיה נט.
+                  </p>
+                  <div className="flex gap-4 text-xs">
+                    <a href="/methodology" className="hover:text-foreground transition-colors">מתודולוגיה</a>
+                    <a href="/about" className="hover:text-foreground transition-colors">אודות</a>
+                  </div>
+                </div>
               </div>
             </footer>
           </div>

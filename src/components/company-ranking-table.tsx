@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { ScoreGauge, ScoreBar } from "@/components/score-gauge";
 import { FUND_LIMITATIONS } from "@/lib/constants/funds";
+import { cn } from "@/lib/utils";
 
 interface CompanyRankingRow {
   company: {
@@ -112,10 +113,10 @@ export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
   }
 
   return (
-    <div className="rounded-lg border border-border overflow-hidden">
+    <div className="rounded-xl border border-border/60 overflow-hidden shadow-sm bg-card">
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted/50">
+          <TableRow className="bg-muted/30 border-b border-border/50">
             <TableHead className="w-12 text-center">
               <button onClick={() => handleSort("rank")} className="font-medium">
                 #{getSortIcon("rank")}
@@ -155,14 +156,22 @@ export function CompanyRankingTable({ rankings }: CompanyRankingTableProps) {
           {sortedRankings.map((row) => {
             const penalties = getCompanyPenalties(row.company.id);
             return (
-              <TableRow key={row.company.id} className="hover:bg-muted/30">
-                <TableCell className="text-center font-medium text-muted-foreground">
-                  {row.score.rank}
+              <TableRow key={row.company.id} className="hover:bg-primary/[0.02] transition-colors border-b border-border/30 last:border-b-0">
+                <TableCell className="text-center">
+                  <span className={cn(
+                    "inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold",
+                    row.score.rank === 1 ? "bg-amber-100 text-amber-700" :
+                    row.score.rank === 2 ? "bg-slate-100 text-slate-600" :
+                    row.score.rank === 3 ? "bg-orange-100 text-orange-700" :
+                    "text-muted-foreground"
+                  )}>
+                    {row.score.rank}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <a
                     href={`/company/${row.company.id}`}
-                    className="hover:underline"
+                    className="hover:text-primary transition-colors"
                   >
                     <div className="font-medium text-base">
                       {row.company.nameHebrew}
