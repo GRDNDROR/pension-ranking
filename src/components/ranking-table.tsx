@@ -302,7 +302,7 @@ export function RankingTable({ rankings }: RankingTableProps) {
                       />
                       <ScoreBar
                         score={row.score.feeScore ?? 50}
-                        label="עמלות"
+                        label="ד״נ"
                       />
                       <ScoreBar
                         score={row.score.sizeScore ?? 50}

@@ -1,39 +1,39 @@
 export const SCORING_WEIGHTS = {
   returns: {
-    weight: 0.3,
+    weight: 0.40, // primary factor - long-term returns are what matters most
     subWeights: {
-      trailing5Yr: 0.25,
-      trailing3Yr: 0.2,
-      yearToDate: 0.1,
-      sharpeRatio: 0.2,
-      consistency: 0.1, // standard deviation of annual returns - lower is better
+      trailing5Yr: 0.30, // strongest signal for long-term performance
+      trailing3Yr: 0.20,
+      yearToDate: 0.05,
+      sharpeRatio: 0.20, // risk-adjusted returns
+      consistency: 0.10, // standard deviation of annual returns - lower is better
       alpha: 0.15, // excess return above benchmark
     },
   },
-  fees: {
-    weight: 0.1, // reduced - fees shown are per-track (external mgmt costs), not per-member
-    subWeights: {
-      managementFee: 0.6,
-      depositFee: 0.4,
-    },
-  },
   actuarialBalance: {
-    weight: 0.2, // key indicator of fund health
-  },
-  fundSize: {
-    weight: 0.1,
+    weight: 0.20, // key indicator of fund health & solvency
   },
   serviceQuality: {
-    weight: 0.15, // real CMA service index data (2024)
-  },
-  netFlow: {
-    weight: 0.05, // net deposits / total assets - fund attractiveness
+    weight: 0.20, // CMA service index + availability + responsiveness
   },
   claimsApproval: {
-    weight: 0.05, // reduced - no real data yet, neutral score
+    weight: 0.10, // claims approval rates - critical for retirees
+  },
+  fees: {
+    weight: 0.05, // marginal factor - external management fees per track
+    subWeights: {
+      managementFee: 0.7,
+      depositFee: 0.3,
+    },
+  },
+  fundSize: {
+    weight: 0.03, // minor stability indicator
+  },
+  netFlow: {
+    weight: 0.02, // minor signal of fund attractiveness
   },
   trackFlexibility: {
-    weight: 0.05, // reduced - static data
+    weight: 0.0, // merged into serviceQuality
   },
 } as const;
 

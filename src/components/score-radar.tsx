@@ -32,7 +32,7 @@ export function ScoreRadar({
 }: ScoreRadarProps) {
   const data = [
     { metric: "תשואות", value: returnScore, fullMark: 100 },
-    { metric: "ד\"נ חיצוניים", value: feeScore, fullMark: 100 },
+    { metric: "דמי ניהול", value: feeScore, fullMark: 100 },
     { metric: "גודל קרן", value: sizeScore, fullMark: 100 },
     { metric: "איזון אקטוארי", value: actuarialScore, fullMark: 100 },
     { metric: "שירות", value: serviceScore, fullMark: 100 },
