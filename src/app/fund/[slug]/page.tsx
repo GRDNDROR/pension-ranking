@@ -64,8 +64,10 @@ export default async function FundDetailPage({
   const history = getFundPerformanceHistory(fund.id);
   const limits = fund.companyId ? FUND_LIMITATIONS[fund.companyId] : null;
 
+  const isRetiree = score?.scoringCategory?.includes("retiree") ?? false;
+
   const deductions: Array<{ label: string; reason: string; points: number }> = [];
-  if (limits?.acceptsWithoutHealthDeclaration) {
+  if (limits?.acceptsWithoutHealthDeclaration && !isRetiree) {
     deductions.push({
       label: "קבלה ללא הצהרת בריאות",
       reason:

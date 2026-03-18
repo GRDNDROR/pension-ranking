@@ -269,7 +269,7 @@ export function calculateAllScores(funds: FundData[]): CalculatedScore[] {
       flexibilityScore * SCORING_WEIGHTS.trackFlexibility.weight;
 
     // Apply penalties
-    const penaltyTotal = calculatePenalties(fund, ranges);
+    const penaltyTotal = calculatePenalties(fund, ranges, isRetireeCategory);
 
     const overallScore = Math.max(0, Math.min(100, baseScore - penaltyTotal));
 
@@ -385,12 +385,13 @@ function calculateFlexibilityScore(
 
 function calculatePenalties(
   fund: FundData,
-  ranges: ReturnType<typeof computeRanges>
+  ranges: ReturnType<typeof computeRanges>,
+  isRetireeCategory: boolean = false
 ): number {
   let total = 0;
 
-  // Penalty: accepts members without health declaration
-  if (fund.characteristics?.acceptsWithoutHealthDeclaration) {
+  // Penalty: accepts members without health declaration (not relevant for retirees)
+  if (fund.characteristics?.acceptsWithoutHealthDeclaration && !isRetireeCategory) {
     total += PENALTIES.noHealthDeclaration.maxDeduction;
   }
 
