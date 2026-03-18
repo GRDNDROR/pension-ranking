@@ -54,7 +54,7 @@ export default function MethodologyPage() {
       points: PENALTIES.noHealthDeclaration.maxDeduction,
       description: PENALTIES.noHealthDeclaration.description,
       detail:
-        "קרנות כמו אלטשולר שחם, מיטב, מור ואינפיניטי מקבלות מבוטחים ללא הצהרת בריאות. הדבר עלול ליצור עלייה בתביעות ולפגוע באיזון האקטוארי, שמשפיע על כלל החוסכים בקרן.",
+        "קרנות כמו אלטשולר שחם, מיטב, מור ואינפיניטי מקבלות מבוטחים ללא הצהרת בריאות. הדבר עלול ליצור עלייה בתביעות ולפגוע באיזון האקטוארי. הערה: קנס זה לא חל על מסלולי מקבלי קצבה, כיוון שהצהרת בריאות אינה רלוונטית למי שכבר יצא לפנסיה.",
     },
     {
       name: "קרן קטנה מאוד",
@@ -210,12 +210,51 @@ export default function MethodologyPage() {
         ))}
       </div>
 
+      {/* Additional Mechanisms */}
+      <h3 className="text-xl font-bold mb-4">מנגנונים נוספים</h3>
+      <div className="space-y-4 mb-8">
+        <Card className="border-blue-200">
+          <CardContent className="pt-6">
+            <h4 className="font-medium text-base mb-2">הנחת אמינות לקרנות קטנות</h4>
+            <p className="text-sm text-muted-foreground">
+              חברות עם סך נכסים מתחת ל-50 מיליארד ₪ מקבלות ציון אקטוארי וציון
+              תביעות מופחת אמינות - הציון נמשך לכיוון ציון ניטרלי (50) באופן
+              יחסי לגודל החברה. הסיבה: בקרנות קטנות, אירוע בודד (כמו תביעת נכות
+              אחת) יכול לשבש את האיזון האקטוארי באופן משמעותי, ולכן אין לתת
+              משקל מלא לנתונים אלה.
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-blue-200">
+          <CardContent className="pt-6">
+            <h4 className="font-medium text-base mb-2">איזון אקטוארי היסטורי</h4>
+            <p className="text-sm text-muted-foreground">
+              ציון האיזון האקטוארי מחושב כממוצע משוקלל של כל הנתונים ההיסטוריים
+              ולא רק של התקופה האחרונה. המשקלות: 3 שנים אחרונות (35%), 3-5 שנים
+              (25%), 5-10 שנים (20%), מעל 10 שנים (20%). בנוסף, חברות עם אחוז
+              גבוה של תקופות בגירעון אקטוארי מקבלות קנס נוסף.
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="border-blue-200">
+          <CardContent className="pt-6">
+            <h4 className="font-medium text-base mb-2">קנס זרימת כספים שלילית</h4>
+            <p className="text-sm text-muted-foreground">
+              חברה שנמצאת במאזן שלילי בין מצטרפים לעוזבים מקבלת קנס של עד 8
+              נקודות. זרימה שלילית מהווה &quot;הצבעת רגליים&quot; של המבוטחים
+              ומצביעה על חוסר שביעות רצון. במסלולי מקבלי קצבה, זרימה שלילית
+              היא טבעית ולכן לא מוענשת.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Data Sources */}
       <h3 className="text-xl font-bold mb-4">מקורות מידע</h3>
       <Card>
         <CardContent className="pt-6 space-y-3 text-sm">
           <div className="flex justify-between py-2 border-b">
-            <span className="text-muted-foreground">תשואות ודמי ניהול</span>
+            <span className="text-muted-foreground">תשואות וביצועים</span>
             <span>data.gov.il - פנסיה נט</span>
           </div>
           <div className="flex justify-between py-2 border-b">
